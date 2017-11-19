@@ -7,9 +7,86 @@ color_string_dict = {0 : colored('0', 'cyan'),
                      1 : colored('1', 'white'),
                      2 : colored('2', 'yellow'),
                      3 : colored('3', 'green'),
-                     5 : colored('5', 'red')}
+                     5 : colored('5', 'red'),
+                     -1 : colored('9', 'white')}
 
-class landmap:
+def _print_map(layer, color=None):
+    out_str = ''
+    for y in range(layer.shape[0]-1):
+        for x in range(layer.shape[1]-1):
+            if color is None:
+                out_str += color_string_dict[int(layer[x][y])] + " "
+            else:
+                if int(layer[x][y]) == -1:
+                    out_str += 2*color_string_dict[int(layer[x][y])] + " "
+                else:
+                    if len(str(int(layer[x][y]))) == 1:
+                        out_str += colored('0'+str(int(layer[x][y])), 'red')
+                    else:
+                        out_str += colored(str(int(layer[x][y])), 'red')
+                    out_str += " "
+        out_str += '\n'
+    print(out_str)
+
+class map:
+    def __init__(self, x, y, n_cities=0, n_water=0):
+        self._land_layer = _land_layer(x,y)
+        self._cities = []
+        self._city_layer = _city_layer(x,y)
+        if n_cities:
+            for i in range(n_cities):
+                self.add_city()
+        if n_water:
+            for i in range(n_water):
+                self._land_layer.add_water_source()
+
+    def add_city(self):
+        self._cities.append(city(self._land_layer))
+        _x, _y = self._cities[-1].get_location()
+        self._city_layer._grid[_y][_x] = len(self._cities)
+
+    def build_station(self, id_):
+        try:
+            assert id_ > 0
+            self._cities[id_-1].add_station()
+        except:
+            print("Invalid City ID '{}'".format(id_))
+
+    def get_city_info(self, id_):
+        try:
+            assert id_ > 0
+            print(self._cities[id_-1].print_info())
+        except:
+            print("Invalid City ID '{}'".format(id_))
+
+    def print_layer(self, name):
+        if name == 'land':
+            self._land_layer._print_layer()
+        elif name == 'cities':
+            self._city_layer._print_layer()
+        else:
+            print("Invalid Layer Name")
+
+    def print_map(self):
+        _tmp0 = np.copy(self._city_layer._grid)
+        np.place(_tmp0, _tmp0 != -1, [5])
+        _tmp = np.where(_tmp0 == -1, 
+                        self._land_layer._grid, 
+                        _tmp0)
+        return _print_map(_tmp0)
+        
+class _city_layer:
+    def __init__(self, x, y):
+        self._grid = np.full((x,y), -1)
+
+    def _add_city(self):
+        _x, _y = self._cities[-1].get_location()
+        self._grid[_y][_x] = 5
+
+    def _print_layer(self):
+        return _print_map(self._grid, 'red')
+
+class _land_layer:
     def __init__(self, x, y):
         self._grid = np.random.rand(x,y)+np.random.randint(1,4, size=(x,y))
         self._generate_map()
@@ -35,7 +112,8 @@ class landmap:
        _neighbours = self._get_neighbours(x, y)
        _vals = []
        for neighbour in _neighbours:
-           _vals.append(uniform(self._grid[neighbour[1]][neighbour[0]],self._grid[neighbour[1]][neighbour[0]-1]))
+           _vals.append(uniform(self._grid[neighbour[1]][neighbour[0]],
+                              self._grid[neighbour[1]][neighbour[0]-1]))
        return choice(_vals)
 
     def _generate_map(self):
@@ -104,21 +182,31 @@ class landmap:
         self._place_water_source(randint(0, self._grid.shape[1]-1), randint(0, self._grid.shape[0]-1))
 
 
-    def print_map(self):
-        out_str = ''
-        for y in range(self._grid.shape[0]):
-            for x in range(self._grid.shape[1]):
-                out_str += color_string_dict[int(self._grid[x][y])] + " "
-            out_str += '\n'
-        print(out_str)
+    def _print_layer(self):
+        return _print_map(self._grid)
 
 class city:
-    def __init__(self, mapobject):
+    def __init__(self, landlayer):
         self._name = name_gen.gen_name()
         self._population = -1
         self._stations = []
         self._location = None
-        self._place_at_random(mapobject)
+        self._place_at_random(landlayer)
+
+    def print_info(self):
+        _info='''
+        {}
+        -----------------------
+        Location: ({}, {})
+        Population: {}
+        Stations: {}
+        -----------------------
+        '''.format(self._name,
+                   self._location[1]+1,
+                   self._location[0]+1,
+                   self._population,
+                   ','.join(self._stations))
+        return _info 
 
     def get_name(self):
         return self._name
@@ -132,24 +220,15 @@ class city:
     def get_location(self):
         return self._location
 
-    def _place_at_random(self, mapobject):
+    def _place_at_random(self, landlayer):
         _val = 0
         while _val != 3:
-            _x = randint(0, mapobject._grid.shape[1]-1)
-            _y = randint(0, mapobject._grid.shape[0]-1)
-            for neighbour in mapobject._get_neighbours(_x, _y):
-                if mapobject._grid[neighbour[0]][neighbour[1]] == 5:
+            _x = randint(0, landlayer._grid.shape[1]-1)
+            _y = randint(0, landlayer._grid.shape[0]-1)
+            for neighbour in landlayer._get_neighbours(_x, _y):
+                if landlayer._grid[neighbour[1]][neighbour[0]] == 5:
                     continue
-            _val = int(mapobject._grid[_y][_x])
-        mapobject._grid[_y][_x] = 5
+            _val = int(landlayer._grid[_y][_x])
+        landlayer._grid[_y][_x] = 5
         self._location = (_x, _y)
 
-
-
-if __name__ in "__main__":
-    _map = landmap(30,30)
-    _map.add_water_source()
-    _map.add_water_source()
-    for i in range(20):
-        _city = city(_map)
-    _map.print_map()

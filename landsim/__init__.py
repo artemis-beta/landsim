@@ -1,5 +1,6 @@
 import numpy as np
 from random import choice, uniform, randint
+from . import name_gen
 from termcolor import colored
 
 color_string_dict = {0 : colored('0', 'cyan'),
@@ -113,10 +114,23 @@ class landmap:
 
 class city:
     def __init__(self, mapobject):
-        self._name = None
+        self._name = name_gen.gen_name()
         self._population = -1
+        self._stations = []
         self._location = None
         self._place_at_random(mapobject)
+
+    def get_name(self):
+        return self._name
+
+    def add_station(self):
+        self._stations.append(name_gen.gen_station_name(self._name))
+
+    def get_stations(self):
+        return self._stations
+
+    def get_location(self):
+        return self._location
 
     def _place_at_random(self, mapobject):
         _val = 0
@@ -136,6 +150,6 @@ if __name__ in "__main__":
     _map = landmap(30,30)
     _map.add_water_source()
     _map.add_water_source()
-    for i in range(10):
+    for i in range(20):
         _city = city(_map)
     _map.print_map()

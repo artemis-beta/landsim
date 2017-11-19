@@ -25,4 +25,11 @@ my_map.build_station(i)                # Build at town id=i
 
 ```
 
+## Map Display
+
 ![Alt text](./example.png?raw=true "An Example Map")
+
+## Cities View with IDs
+
+
+![Alt text](./cities_view.png?raw=true "Cities with IDs")

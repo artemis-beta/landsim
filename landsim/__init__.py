@@ -5,7 +5,8 @@ from termcolor import colored
 color_string_dict = {0 : colored('0', 'cyan'),
                      1 : colored('1', 'white'),
                      2 : colored('2', 'yellow'),
-                     3 : colored('3', 'green')}
+                     3 : colored('3', 'green'),
+                     5 : colored('5', 'red')}
 
 class landmap:
     def __init__(self, x, y):
@@ -110,9 +111,31 @@ class landmap:
             out_str += '\n'
         print(out_str)
 
+class city:
+    def __init__(self, mapobject):
+        self._name = None
+        self._population = -1
+        self._location = None
+        self._place_at_random(mapobject)
+
+    def _place_at_random(self, mapobject):
+        _val = 0
+        while _val != 3:
+            _x = randint(0, mapobject._grid.shape[1]-1)
+            _y = randint(0, mapobject._grid.shape[0]-1)
+            for neighbour in mapobject._get_neighbours(_x, _y):
+                if mapobject._grid[neighbour[0]][neighbour[1]] == 5:
+                    continue
+            _val = int(mapobject._grid[_y][_x])
+        mapobject._grid[_y][_x] = 5
+        self._location = (_x, _y)
+
+
 
 if __name__ in "__main__":
-    _map = landmap(20,20)
+    _map = landmap(30,30)
     _map.add_water_source()
     _map.add_water_source()
+    for i in range(10):
+        _city = city(_map)
     _map.print_map()

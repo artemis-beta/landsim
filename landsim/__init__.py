@@ -18,7 +18,7 @@ def _print_map(layer, color=None):
                 out_str += color_string_dict[int(layer[x][y])] + " "
             else:
                 if int(layer[x][y]) == -1:
-                    out_str += 2*color_string_dict[int(layer[x][y])] + " "
+                    out_str += 2*color_string_dict[-1] + " "
                 else:
                     if len(str(int(layer[x][y]))) == 1:
                         out_str += colored('0'+str(int(layer[x][y])), 'red')
@@ -41,7 +41,7 @@ class map:
                 self._land_layer.add_water_source()
 
     def add_city(self):
-        self._cities.append(city(self._land_layer))
+        self._cities.append(city(self))
         _x, _y = self._cities[-1].get_location()
         self._city_layer._grid[_y][_x] = len(self._cities)
 
@@ -63,18 +63,19 @@ class map:
         if name == 'land':
             self._land_layer._print_layer()
         elif name == 'cities':
-            self._city_layer._print_layer()
+            return self._city_layer._print_layer()
         else:
             print("Invalid Layer Name")
 
     def print_map(self):
         _tmp0 = np.copy(self._city_layer._grid)
+        _tmp1 = np.copy(self._land_layer._grid)
         np.place(_tmp0, _tmp0 != -1, [5])
         _tmp = np.where(_tmp0 == -1, 
-                        self._land_layer._grid, 
+                        _tmp1, 
                         _tmp0)
-        return _print_map(_tmp0)
-        
+        _print_map(_tmp)
+
 class _city_layer:
     def __init__(self, x, y):
         self._grid = np.full((x,y), -1)
@@ -84,7 +85,8 @@ class _city_layer:
         self._grid[_y][_x] = 5
 
     def _print_layer(self):
-        return _print_map(self._grid, 'red')
+        _tmp0 = np.copy(self._grid)
+        return _print_map(_tmp0, 'red')
 
 class _land_layer:
     def __init__(self, x, y):
@@ -186,12 +188,13 @@ class _land_layer:
         return _print_map(self._grid)
 
 class city:
-    def __init__(self, landlayer):
+    def __init__(self, map_):
+        from random import randint
         self._name = name_gen.gen_name()
-        self._population = -1
+        self._population = randint(1000,1E5)
         self._stations = []
         self._location = None
-        self._place_at_random(landlayer)
+        self._place_at_random(map_)
 
     def print_info(self):
         _info='''
@@ -220,15 +223,14 @@ class city:
     def get_location(self):
         return self._location
 
-    def _place_at_random(self, landlayer):
+    def _place_at_random(self, map_):
         _val = 0
         while _val != 3:
-            _x = randint(0, landlayer._grid.shape[1]-1)
-            _y = randint(0, landlayer._grid.shape[0]-1)
-            for neighbour in landlayer._get_neighbours(_x, _y):
-                if landlayer._grid[neighbour[1]][neighbour[0]] == 5:
+            _x = randint(0, map_._land_layer._grid.shape[1]-1)
+            _y = randint(0, map_._land_layer._grid.shape[0]-1)
+            for neighbour in map_._land_layer._get_neighbours(_x, _y):
+                if map_._city_layer._grid[neighbour[1]][neighbour[0]] != -1:
                     continue
-            _val = int(landlayer._grid[_y][_x])
-        landlayer._grid[_y][_x] = 5
+            _val = int(map_._land_layer._grid[_y][_x])
         self._location = (_x, _y)
 

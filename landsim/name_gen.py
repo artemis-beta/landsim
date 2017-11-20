@@ -1,15 +1,20 @@
 _pre = ["West ", "East ", "North ", "South ", "Little ", "Greater ",
-        "Upper ", "Lower "]
+        "Upper ", "Lower ", "King's "]
 
 _first = [ "Ash", "Bur", "Dor", "Castle",
            "Roch", "Ave", "Bar", "Ban", "Port", "Heath", "Farn", "Whit",
-           "Orp", "Chester", "Stan"]
+           "Orp", "Chester", "Stan", "Beck", "Bex", "Brad", "Abbots", "Abbey",
+           ]
 
-_second = [ "gate", "ton", "ford", "wood", "leigh", "don", "mouth", 
+_second = [ "gate", "ton", "ford", "wood", "leigh", "ley", "don", "mouth", 
             "bury", "borough", "vale", "brook", "hurst", "pool", "land",
-            "bourne"]
+            "bourne", "sey", "burn", "cester", "chapel", "church", "ham",
+            "minster", "mouth", "ness", "port", "shaw", "wich", "wick", "wold",
+            "worth", "well", "market", "chester", "cott", "dale", "head"
+            ]
 
-_third = [" Hill", " Downs", " Spa", " Low", " Cross", " End", " Dale"]
+_third = [" Hill", " Downs", " Spa", " Low", " Cross", " End", " Dale", " Regis",
+          " Magna", " Wick", "Castle", ]
 
 _station = [" Central", " St. Thomas", " St. John's", " St. David's",
             " Square"]

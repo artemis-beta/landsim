@@ -38,7 +38,7 @@ class map:
                 self.add_city()
         if n_water:
             for i in range(n_water):
-                self._land_layer.add_water_source()
+                self._land_layer._add_water_source()
 
     def add_city(self):
         self._cities.append(city(self))

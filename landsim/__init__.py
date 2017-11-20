@@ -12,8 +12,8 @@ color_string_dict = {0 : colored('0', 'cyan'),
 
 def _print_map(layer, color=None):
     out_str = ''
-    for y in range(layer.shape[0]-1):
-        for x in range(layer.shape[1]-1):
+    for y in range(layer.shape[0]):
+        for x in range(layer.shape[1]):
             if color is None:
                 out_str += color_string_dict[int(layer[x][y])] + " "
             else:

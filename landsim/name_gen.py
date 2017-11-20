@@ -14,10 +14,12 @@ _second = [ "gate", "ton", "ford", "wood", "leigh", "ley", "don", "mouth",
             ]
 
 _third = [" Hill", " Downs", " Spa", " Low", " Cross", " End", " Dale", " Regis",
-          " Magna", " Wick", "Castle", ]
+          " Magna", " Wick", " Castle", " Vale"]
 
 _station = [" Central", " St. Thomas", " St. John's", " St. David's",
             " Square"]
+
+_location = ["-on-the-Moor", "-on-Sea", "-on-the-Hill"]
 
 def gen_station_name(name):
     from random import randint, choice
@@ -48,6 +50,8 @@ def gen_name(can_have_third=True, can_have_pre=True):
 
     else:
         _out_str += choice(_first) + choice(_second)
+        if randint(0,10) > 8:
+            _out_str += choice(_location)
 
     return _out_str
 

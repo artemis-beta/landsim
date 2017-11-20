@@ -45,6 +45,9 @@ class map:
         _x, _y = self._cities[-1].get_location()
         self._city_layer._grid[_y][_x] = len(self._cities)
 
+    def add_water_source(self):
+        return self._land_layer._add_water_source()
+
     def build_station(self, id_):
         try:
             assert id_ > 0
@@ -180,7 +183,7 @@ class _land_layer:
             if _trials > self._grid.shape[0]+10:
                 _success = False
 
-    def add_water_source(self):
+    def _add_water_source(self):
         self._place_water_source(randint(0, self._grid.shape[1]-1), randint(0, self._grid.shape[0]-1))
 
 

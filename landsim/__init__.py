@@ -3,12 +3,12 @@ from random import choice, uniform, randint
 from . import name_gen
 from termcolor import colored
 
-color_string_dict = {0 : colored('0', 'cyan'),
-                     1 : colored('1', 'white'),
-                     2 : colored('2', 'yellow'),
-                     3 : colored('3', 'green'),
-                     5 : colored('5', 'red'),
-                     -1 : colored('9', 'white')}
+color_string_dict = {0 : colored('■', 'cyan'),
+                     1 : colored('■', 'white'),
+                     2 : colored('■', 'yellow'),
+                     3 : colored('■', 'green'),
+                     5 : colored('■', 'red'),
+                     -1 : colored('■', 'white')}
 
 def _print_map(layer, color=None):
     out_str = ''

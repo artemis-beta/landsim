@@ -1,3 +1,13 @@
+#============================================================================#
+#                                LandSim                                     #
+#                           Kristian Zarebski                                #
+#                                                                            #
+# Creates a map of pixel-like areas of different land types as well as       #
+# spawns water sources and cities with names and population info. The module #
+# is currently experimental with new features being added on occasion.       #
+#
+#============================================================================#
+
 import numpy as np
 from random import choice, uniform, randint
 from . import name_gen
@@ -10,27 +20,52 @@ color_string_dict = {0 : colored('■', 'cyan'),
                      5 : colored('■', 'red'),
                      -1 : colored('■', 'white')}
 
-def _print_map(layer, color=None):
+def _print_map(layer_array, color=None, color_dict=color_string_dict):
+    '''Print map layer'''
     out_str = ''
-    for y in range(layer.shape[0]):
-        for x in range(layer.shape[1]):
+    for y in range(layer_array.shape[0]):
+        for x in range(layer_array.shape[1]):
             if color is None:
-                out_str += color_string_dict[int(layer[x][y])] + " "
+                out_str += color_dict[int(layer_array[x][y])] + " "
             else:
-                if int(layer[x][y]) == -1:
-                    out_str += 2*color_string_dict[-1] + " "
+                if int(layer_array[x][y]) == -1:
+                    out_str += 2*color_dict[-1] + " "
                 else:
-                    if len(str(int(layer[x][y]))) == 1:
-                        out_str += colored('0'+str(int(layer[x][y])), 'red')
+                    if len(str(int(layer_array[x][y]))) == 1:
+                        out_str += colored('0'+str(int(layer_array[x][y])), 'red')
                     else:
-                        out_str += colored(str(int(layer[x][y])), 'red')
+                        out_str += colored(str(int(layer_array[x][y])), 'red')
                     out_str += " "
         out_str += '\n'
     print(out_str)
 
 class map:
     def __init__(self, x, y, n_cities=0, n_water=0):
+        '''
+        Map class to create a map consisting of squares of different colours
+        representing different land types. Note the ability to display the map
+        depends entirely on the size of the terminal/notebook being used
+        (obviously a 50x50 map is going to have issues on a terminal of width 20
+        characters!)
+
+        Arguments
+        ---------
+
+        x    (int)        map width
+
+        y    (int)        map height
+
+
+        Optional Arguments
+        ------------------
+
+        n_cities     (int)      number of cities to place on map
+
+        n_water      (int)      number of water sources to spawn
+        '''
+
         self._land_layer = _land_layer(x,y)
+        self._resource_layer = _resource_layer(x,y, self._land_layer)
         self._cities = []
         self._city_layer = _city_layer(x,y)
         if n_cities:
@@ -41,14 +76,24 @@ class map:
                 self._land_layer._add_water_source()
 
     def add_city(self):
+        '''Add a new randomly placed city to the map'''
         self._cities.append(city(self))
         _x, _y = self._cities[-1].get_location()
         self._city_layer._grid[_y][_x] = len(self._cities)
 
     def add_water_source(self):
+        '''Add a new randomly placed water source to the map'''
         return self._land_layer._add_water_source()
 
     def build_station(self, id_):
+        '''
+        Add a station to the named city
+
+        Arguments
+        ---------
+
+        id    (int)      the city id number
+        '''
         try:
             assert id_ > 0
             self._cities[id_-1].add_station()
@@ -56,6 +101,14 @@ class map:
             print("Invalid City ID '{}'".format(id_))
 
     def get_city_info(self, id_):
+        '''
+        Print the information for a given city
+
+        Arguments
+        ---------
+
+        id    (int)      the city id number
+        '''
         try:
             assert id_ > 0
             print(self._cities[id_-1].print_info())
@@ -63,14 +116,27 @@ class map:
             print("Invalid City ID '{}'".format(id_))
 
     def print_layer(self, name):
-        if name == 'land':
-            self._land_layer._print_layer()
-        elif name == 'cities':
-            return self._city_layer._print_layer()
+        '''
+        Print a selected layer.
+
+        Arguments
+        ---------
+
+        name      (string)       name of map layer
+                                 (cities/land/resources)
+        '''
+        _print_dict = {'cities' : self._city_layer,
+                       'land'   : self._land_layer,
+                       'resources' : self._resource_layer}
+        
+        if name in _print_dict:
+            return _print_dict[name]._print_layer()
+        
         else:
             print("Invalid Layer Name")
 
     def print_map(self):
+        '''Print the map'''
         _tmp0 = np.copy(self._city_layer._grid)
         _tmp1 = np.copy(self._land_layer._grid)
         np.place(_tmp0, _tmp0 != -1, [5])
@@ -79,9 +145,29 @@ class map:
                         _tmp0)
         _print_map(_tmp)
 
-class _city_layer:
+class _layer(object):
+    '''
+    Layer class for creating new map layer
+
+    Arguments
+    ---------
+
+    x    (int)       layer width
+
+    y    (int)       layer height
+    '''
     def __init__(self, x, y):
         self._grid = np.full((x,y), -1)
+
+    def _print_layer(self):
+        '''Print the layer'''
+        return _print_map(self._grid)
+
+
+class _city_layer(_layer):
+    '''Special instance of layer class for cities'''
+    def __init__(self, x, y):
+        _layer.__init__(self, x, y)
 
     def _add_city(self):
         _x, _y = self._cities[-1].get_location()
@@ -91,8 +177,26 @@ class _city_layer:
         _tmp0 = np.copy(self._grid)
         return _print_map(_tmp0, 'red')
 
-class _land_layer:
+class _resource_layer(_layer):
+    def __init__(self, x, y, template):
+        _layer.__init__(self, x, y)
+        self._colors = {9 : colored('■', 'white'),
+                        1 : colored('#', 'grey' ),
+                        2 : colored(',,', 'green')}
+
+        template._generate_map()
+        _tmp = np.copy(self._grid)
+        np.place(_tmp, self._grid > 2, [9])
+        np.place(_tmp, self._grid < 0, [0])
+        self._grid = np.where(_tmp == 0, 
+                              np.full((x,y),9),
+                              _tmp)
+    def _print_layer(self):
+        return _print_map(self._grid, color_dict=self._colors)
+
+class _land_layer(_layer):
     def __init__(self, x, y):
+        _layer.__init__(self, x, y)
         self._grid = np.random.rand(x,y)+np.random.randint(1,4, size=(x,y))
         self._generate_map()
 
@@ -187,11 +291,17 @@ class _land_layer:
         self._place_water_source(randint(0, self._grid.shape[1]-1), randint(0, self._grid.shape[0]-1))
 
 
-    def _print_layer(self):
-        return _print_map(self._grid)
-
 class city:
     def __init__(self, map_):
+        '''
+        City class which holds all information for a city contained within
+        a map. Cities are spawned within maps.
+
+        Arguments
+        ---------
+
+        map_       (map)       parent map
+        '''
         from random import randint
         self._name = name_gen.gen_name()
         self._population = randint(1000,1E5)
@@ -200,6 +310,7 @@ class city:
         self._place_at_random(map_)
 
     def print_info(self):
+        '''Print the city information'''
         _info='''
         {}
         -----------------------
@@ -215,18 +326,23 @@ class city:
         return _info 
 
     def get_name(self):
+        '''Returns the name of the city'''
         return self._name
 
     def add_station(self):
+        '''Adds a new station to the city'''
         self._stations.append(name_gen.gen_station_name(self._name))
 
     def get_stations(self):
+        '''Returns a list of all stations within the city'''
         return self._stations
 
     def get_location(self):
+        '''Returns co-ordinates for the given city'''
         return self._location
 
     def _place_at_random(self, map_):
+        '''Randomly place a city on the stated map'''
         _val = 0
         while _val != 3:
             _x = randint(0, map_._land_layer._grid.shape[1]-1)

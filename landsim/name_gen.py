@@ -1,23 +1,27 @@
 _pre = ["West ", "East ", "North ", "South ", "Little ", "Greater ",
-        "Upper ", "Lower ", "King's "]
+        "Upper ", "Lower ", "King's ", "Queen's "]
 
 _first = [ "Ash", "Bur", "Dor", "Castle", "Berk", "Dun", "Al", "Temple",
            "Roch", "Ave", "Bar", "Ban", "Port", "Heath", "Farn", "Whit",
            "Orp", "Chester", "Stan", "Beck", "Bex", "Brad", "Abbots", "Abbey",
+           "Wick", "Barn", "Ast", "Ayls", "Oak", "Ray", "Rain", "Sand", "Pen",
+           "Silver", "War"
            ]
 
 _second = [ "gate", "ton", "ford", "wood", "leigh", "ley", "don", "mouth", 
             "bury", "borough", "vale", "brook", "hurst", "pool", "land",
             "bourne", "sey", "burn", "cester", "chapel", "church", "ham", "hampton",
-            "minster", "mouth", "ness", "port", "shaw", "wich", "wick", "wold",
+            "minster", "ness", "port", "shaw", "wich", "wick", "wold",
             "worth", "well", "market", "chester", "cott", "dale", "head"
             ]
 
 _third = [" Hill", " Downs", " Spa", " Low", " Cross", " End", " Dale", " Regis",
-          " Magna", " Wick", " Castle", " Vale", " Major", " Minor"]
+          " Magna", " Wick", " Castle", " Vale", " Major", " Minor", " Bay", " Moor"]
 
 _station = [" Central", " St. Thomas", " St. John's", " St. David's",
-            " Square"]
+            " Square", " West", " East", " North", " South", " Common",
+            " Junction", " Park", " Town", " Parkway", " Hill", " International",
+            " Victoria", " Piccadilly", " Lakeside", " Riverside"]
 
 _location = ["-on-the-Moor", "-on-Sea", "-on-the-Hill"]
 

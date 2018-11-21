@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name                =  'landsim'                                     ,
-      version             =  '0.1.0'                                       ,
+      version             =  '0.1.1'                                       ,
       description         =  'Map generation from Monte Carlo.'            ,
       url                 =  'http://github.com/artemis-beta/landsim'      ,
       author              =  'Kristian Zarebski'                           ,

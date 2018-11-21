@@ -26,15 +26,15 @@ def _print_map(layer_array, color=None, color_dict=color_string_dict):
     for y in range(layer_array.shape[0]):
         for x in range(layer_array.shape[1]):
             if color is None:
-                out_str += color_dict[int(layer_array[x][y])] + " "
+                out_str += color_dict[int(layer_array[y][x])] + " "
             else:
-                if int(layer_array[x][y]) == -1:
+                if int(layer_array[y][x]) == -1:
                     out_str += 2*color_dict[-1] + " "
                 else:
-                    if len(str(int(layer_array[x][y]))) == 1:
-                        out_str += colored('0'+str(int(layer_array[x][y])), 'red')
+                    if len(str(int(layer_array[y][x]))) == 1:
+                        out_str += colored('0'+str(int(layer_array[y][x])), 'red')
                     else:
-                        out_str += colored(str(int(layer_array[x][y])), 'red')
+                        out_str += colored(str(int(layer_array[y][x])), 'red')
                     out_str += " "
         out_str += '\n'
     print(out_str)
